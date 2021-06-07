@@ -2,6 +2,7 @@
 
 module serv_top
   #(parameter WITH_CSR = 1,
+    parameter PRE_REGISTER = 1,
     parameter RESET_STRATEGY = "MINI",
     parameter RESET_PC = 32'd0)
    (
@@ -63,6 +64,7 @@ module serv_top
    wire [4:0]    rs2_addr;
 
    wire [3:0] 	 immdec_ctrl;
+   wire [3:0] 	immdec_en;
 
    wire          sh_right;
    wire 	 bne_or_bge;
@@ -203,7 +205,9 @@ module serv_top
       .i_rf_ready     (i_rf_ready),
       .o_rf_rd_en     (rd_en));
 
-   serv_decode decode
+   serv_decode
+     #(.PRE_REGISTER (PRE_REGISTER))
+   decode
      (
       .clk (clk),
       //Input
@@ -253,6 +257,7 @@ module serv_top
       .o_csr_imm_en       (csr_imm_en),
       //To top
       .o_immdec_ctrl      (immdec_ctrl),
+      .o_immdec_en        (immdec_en),
       .o_rd_csr_en        (rd_csr_en),
       .o_rd_alu_en        (rd_alu_en));
 
@@ -263,6 +268,7 @@ module serv_top
       .i_cnt_en     (cnt_en),
       .i_cnt_done   (cnt_done),
       //Control
+      .i_immdec_en        (immdec_en),
       .i_csr_imm_en (csr_imm_en),
       .i_ctrl       (immdec_ctrl),
       .o_rd_addr    (rd_addr),
